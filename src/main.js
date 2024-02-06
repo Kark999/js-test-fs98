@@ -1,4 +1,6 @@
 import axios from 'axios';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 
 const fetchPostsBtn = document.querySelector('.btn');
 const postList = document.querySelector('.posts');
@@ -6,9 +8,19 @@ const postList = document.querySelector('.posts');
 // Controls the group number
 let page = 1;
 // Controls the number of items in the group
-let perPage = 5;
+let limit = 40;
+// In our case total number of pages is calculated on frontend
+const totalPages = Math.ceil(100 / limit);
 
 fetchPostsBtn.addEventListener('click', async () => {
+  // Check the end of the collection to display an alert
+  if (page > totalPages) {
+    return iziToast.error({
+      position: 'topRight',
+      message: "We're sorry, there are no more posts to load",
+    });
+  }
+
   try {
     const posts = await fetchPosts();
     renderPosts(posts);
@@ -26,7 +38,7 @@ fetchPostsBtn.addEventListener('click', async () => {
 
 async function fetchPosts() {
   const params = new URLSearchParams({
-    _limit: perPage,
+    _limit: limit,
     _page: page,
   });
 
